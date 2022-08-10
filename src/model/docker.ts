@@ -27,6 +27,10 @@ class Docker {
     return `docker run \
             --workdir /github/workspace \
             --rm \
+            --cap-add=NET_ADMIN \
+            --cap-add=SYS_ADMIN \
+            --device=/dev/net/tun \
+            --user=0 \
             ${ImageEnvironmentFactory.getEnvVarString(parameters)} \
             --env UNITY_SERIAL \
             --env GITHUB_WORKSPACE=/github/workspace \
