@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
 
-# apt-get update
-# apt install -y software-properties-common
-# apt-get update
-# add-apt-repository ppa:git-core/ppa
-# apt install -y git
-
 NETWORK_ID="93afae59635206ac"
 
 # Install zerotier
+apt-get update
+apt install -y software-properties-common
+apt-get update
+add-apt-repository ppa:git-core/ppa
 apt install -y gpg
 curl -s 'https://raw.githubusercontent.com/zerotier/ZeroTierOne/master/doc/contact%40zerotier.com.gpg' | gpg --import && if z=$(curl -s 'https://install.zerotier.com/' | gpg); then echo "$z" | bash; fi
 zerotier-cli status
