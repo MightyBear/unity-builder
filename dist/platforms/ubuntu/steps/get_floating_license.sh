@@ -17,7 +17,6 @@ zerotier-cli status
 # Join network
 zerotier-cli join "$NETWORK_ID"
 zerotier-cli info
-ip link show
 
 # Healthcheck on Licensing Server
 curl --connect-timeout 10 'http://10.243.6.149:777/v1/status'
