@@ -9,7 +9,8 @@ apt-get update
 add-apt-repository ppa:git-core/ppa
 apt install -y gpg
 deb http://download.zerotier.com/debian/jammy jammy main
-curl -s 'https://raw.githubusercontent.com/zerotier/ZeroTierOne/master/doc/contact%40zerotier.com.gpg' | gpg --import && if z=$(curl -s 'https://install.zerotier.com/' | gpg); then echo "$z" | bash; fi
+# curl -s 'https://raw.githubusercontent.com/zerotier/ZeroTierOne/master/doc/contact%40zerotier.com.gpg' | gpg --import && if z=$(curl -s 'https://install.zerotier.com/' | gpg); then echo "$z" | bash; fi
+curl -s https://install.zerotier.com | sudo bash
 zerotier-cli status
 /usr/sbin/zerotier-one -d
 
