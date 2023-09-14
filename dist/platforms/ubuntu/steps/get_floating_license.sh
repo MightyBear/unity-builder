@@ -10,9 +10,9 @@ add-apt-repository ppa:git-core/ppa
 apt install -y gpg
 curl -s 'https://raw.githubusercontent.com/zerotier/ZeroTierOne/master/doc/contact%40zerotier.com.gpg' | gpg --import && if z=$(curl -s 'https://install.zerotier.com/' | gpg); then echo "$z" | bash; fi
 ps -p 1 -o comm=
-service zerotier-one start
-chkconfig zerotier-one on
-service zerotier-one status
+service zerotier-cli start
+chkconfig zerotier-cli on
+service zerotier-cli status
 zerotier-cli status
 /usr/sbin/zerotier-one -d
 
