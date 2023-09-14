@@ -9,14 +9,10 @@ apt-get update
 add-apt-repository ppa:git-core/ppa
 apt install -y gpg
 curl -s 'https://raw.githubusercontent.com/zerotier/ZeroTierOne/master/doc/contact%40zerotier.com.gpg' | gpg --import && if z=$(curl -s 'https://install.zerotier.com/' | gpg); then echo "$z" | bash; fi
-ps -p 1 -o comm=
-echo '{"settings": {"primaryPort": 9994}}' | sudo tee /var/lib/zerotier-one/local.conf > /dev/null
+echo $(ps -p 1 -o comm=)
+update-rc.d zerotier-one enable
 /usr/sbin/zerotier-one -d
-service zerotier-cli start
-chkconfig zerotier-cli on
-service zerotier-cli status
 zerotier-cli status
-
 
 # Join network
 zerotier-cli join "$NETWORK_ID"
