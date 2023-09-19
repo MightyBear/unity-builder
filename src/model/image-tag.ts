@@ -1,20 +1,18 @@
 import Platform from './platform';
 
-import BuildParameters from './build-parameters';
-
 class ImageTag {
   public repository: string;
   public name: string;
-  public cloudRunnerBuilderPlatform!: string | undefined;
+  public cloudRunnerBuilderPlatform!: string;
   public editorVersion: string;
-  public targetPlatform: any;
+  public targetPlatform: string;
   public builderPlatform: string;
-  public customImage: any;
+  public customImage: string;
   public imageRollingVersion: number;
   public imagePlatformPrefix: string;
 
-  constructor(imageProperties: Partial<BuildParameters>) {
-    const { editorVersion = '2019.2.11f1', targetPlatform, customImage, cloudRunnerBuilderPlatform } = imageProperties;
+  constructor(imageProperties: { [key: string]: string }) {
+    const { editorVersion, targetPlatform, customImage, cloudRunnerBuilderPlatform } = imageProperties;
 
     if (!ImageTag.versionPattern.test(editorVersion)) {
       throw new Error(`Invalid version "${editorVersion}".`);
@@ -35,11 +33,11 @@ class ImageTag {
     this.imagePlatformPrefix = ImageTag.getImagePlatformPrefixes(
       isCloudRunnerLocal ? process.platform : cloudRunnerBuilderPlatform,
     );
-    this.imageRollingVersion = 1; // Will automatically roll to the latest non-breaking version.
+    this.imageRollingVersion = 2; // Will automatically roll to the latest non-breaking version.
   }
 
-  static get versionPattern() {
-    return /^20\d{2}\.\d\.\w{3,4}|3$/;
+  static get versionPattern(): RegExp {
+    return /^(20\d{2}\.\d\.\w{3,4}|3)$/;
   }
 
   static get targetPlatformSuffixes() {
@@ -59,7 +57,7 @@ class ImageTag {
     };
   }
 
-  static getImagePlatformPrefixes(platform) {
+  static getImagePlatformPrefixes(platform: string): string {
     switch (platform) {
       case 'win32':
         return 'windows';
@@ -70,7 +68,7 @@ class ImageTag {
     }
   }
 
-  static getTargetPlatformToTargetPlatformSuffixMap(platform, version) {
+  static getTargetPlatformToTargetPlatformSuffixMap(platform: string, version: string): string {
     const { generic, webgl, mac, windows, windowsIl2cpp, wsaPlayer, linux, linuxIl2cpp, android, ios, tvos, facebook } =
       ImageTag.targetPlatformSuffixes;
 
@@ -149,17 +147,17 @@ class ImageTag {
     }
   }
 
-  get tag() {
+  get tag(): string {
     const versionAndPlatform = `${this.editorVersion}-${this.builderPlatform}`.replace(/-+$/, '');
 
     return `${this.imagePlatformPrefix}-${versionAndPlatform}-${this.imageRollingVersion}`;
   }
 
-  get image() {
+  get image(): string {
     return `${this.repository}/${this.name}`.replace(/^\/+/, '');
   }
 
-  toString() {
+  toString(): string {
     const { image, tag, customImage } = this;
 
     if (customImage) return customImage;
@@ -167,4 +165,5 @@ class ImageTag {
     return `${image}:${tag}`; // '0' here represents the docker repo version
   }
 }
+
 export default ImageTag;
