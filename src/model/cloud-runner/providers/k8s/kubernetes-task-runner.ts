@@ -1,12 +1,16 @@
-import { CoreV1Api, KubeConfig, Log } from '@kubernetes/client-node';
-import { Writable } from 'stream';
-import CloudRunnerLogger from '../../services/cloud-runner-logger';
-import * as core from '@actions/core';
-import { CloudRunnerStatics } from '../../cloud-runner-statics';
-import waitUntil from 'async-wait-until';
-import { FollowLogStreamService } from '../../services/follow-log-stream-service';
+import { CoreV1Api, KubeConfig } from '@kubernetes/client-node';
+import CloudRunnerLogger from '../../services/core/cloud-runner-logger';
+import { waitUntil } from 'async-wait-until';
+import { CloudRunnerSystem } from '../../services/core/cloud-runner-system';
+import CloudRunner from '../../cloud-runner';
+import KubernetesPods from './kubernetes-pods';
+import { FollowLogStreamService } from '../../services/core/follow-log-stream-service';
 
 class KubernetesTaskRunner {
+  static lastReceivedTimestamp: number = 0;
+  static readonly maxRetry: number = 3;
+  static lastReceivedMessage: string = ``;
+
   static async runTask(
     kubeConfig: KubeConfig,
     kubeClient: CoreV1Api,
