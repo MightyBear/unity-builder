@@ -32,8 +32,8 @@ class BuildParameters {
   public androidSdkManagerParameters!: string;
   public customParameters!: string;
   public sshAgent!: string;
-  public cloudRunnerCluster!: string;
-  public awsBaseStackName!: string;
+  public sshPublicKeysDirectoryPath!: string;
+  public providerStrategy!: string;
   public gitPrivateToken!: string;
   public awsStackName!: string;
   public kubeConfig!: string;
@@ -112,6 +112,7 @@ class BuildParameters {
       androidSdkManagerParameters,
       customParameters: Input.customParameters,
       sshAgent: Input.sshAgent,
+      sshPublicKeysDirectoryPath: Input.sshPublicKeysDirectoryPath,
       gitPrivateToken: Input.gitPrivateToken || (await GithubCliReader.GetGitHubAuthToken()),
       chownFilesTo: Input.chownFilesTo,
       cloudRunnerCluster: Input.cloudRunnerCluster,

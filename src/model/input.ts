@@ -171,36 +171,12 @@ class Input {
     return Input.getInput('sshAgent') || '';
   }
 
-  static get gitPrivateToken() {
-    return core.getInput('gitPrivateToken') || false;
+  static get sshPublicKeysDirectoryPath(): string {
+    return Input.getInput('sshPublicKeysDirectoryPath') || '';
   }
 
-  static get customJob() {
-    return Input.getInput('customJob') || '';
-  }
-
-  static customJobHooks() {
-    return Input.getInput('customJobHooks') || '';
-  }
-
-  static cachePushOverrideCommand() {
-    return Input.getInput('cachePushOverrideCommand') || '';
-  }
-
-  static cachePullOverrideCommand() {
-    return Input.getInput('cachePullOverrideCommand') || '';
-  }
-
-  static readInputFromOverrideList() {
-    return Input.getInput('readInputFromOverrideList') || '';
-  }
-
-  static readInputOverrideCommand() {
-    return Input.getInput('readInputOverrideCommand') || '';
-  }
-
-  static get cloudRunnerBranch() {
-    return Input.getInput('cloudRunnerBranch') || 'cloud-runner-develop';
+  static get gitPrivateToken(): string | undefined {
+    return Input.getInput('gitPrivateToken');
   }
 
   static get chownFilesTo() {
