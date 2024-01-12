@@ -104,6 +104,24 @@ describe('Input', () => {
     });
   });
 
+  describe('manualExit', () => {
+    it('returns the default value', () => {
+      expect(Input.manualExit).toStrictEqual(false);
+    });
+
+    it('returns true when string true is passed', () => {
+      const spy = jest.spyOn(core, 'getInput').mockReturnValue('true');
+      expect(Input.manualExit).toStrictEqual(true);
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it('returns false when string false is passed', () => {
+      const spy = jest.spyOn(core, 'getInput').mockReturnValue('false');
+      expect(Input.manualExit).toStrictEqual(false);
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('versioningStrategy', () => {
     it('returns the default value', () => {
       expect(Input.versioningStrategy).toStrictEqual('Semantic');
@@ -143,20 +161,36 @@ describe('Input', () => {
     });
   });
 
-  describe('androidAppBundle', () => {
+  describe('androidExportType', () => {
     it('returns the default value', () => {
-      expect(Input.androidAppBundle).toStrictEqual(false);
+      expect(Input.androidExportType).toStrictEqual('androidPackage');
     });
 
-    it('returns true when string true is passed', () => {
-      const spy = jest.spyOn(core, 'getInput').mockReturnValue('true');
-      expect(Input.androidAppBundle).toStrictEqual(true);
+    test.each`
+      input                     | expected
+      ${'androidPackage'}       | ${'androidPackage'}
+      ${'androidAppBundle'}     | ${'androidAppBundle'}
+      ${'androidStudioProject'} | ${'androidStudioProject'}
+    `('returns $expected when $input is passed', ({ input, expected }) => {
+      const spy = jest.spyOn(core, 'getInput').mockReturnValue(input);
+      expect(Input.androidExportType).toStrictEqual(expected);
       expect(spy).toHaveBeenCalledTimes(1);
     });
+  });
 
-    it('returns false when string false is passed', () => {
-      const spy = jest.spyOn(core, 'getInput').mockReturnValue('false');
-      expect(Input.androidAppBundle).toStrictEqual(false);
+  describe('androidSymbolType', () => {
+    it('returns the default value', () => {
+      expect(Input.androidSymbolType).toStrictEqual('none');
+    });
+
+    test.each`
+      input          | expected
+      ${'none'}      | ${'none'}
+      ${'public'}    | ${'public'}
+      ${'debugging'} | ${'debugging'}
+    `('returns $expected when $input is passed', ({ input, expected }) => {
+      const spy = jest.spyOn(core, 'getInput').mockReturnValue(input);
+      expect(Input.androidExportType).toStrictEqual(expected);
       expect(spy).toHaveBeenCalledTimes(1);
     });
   });
