@@ -3,6 +3,7 @@ import { Action, BuildParameters, Cache, CloudRunner, Docker, ImageTag, Output }
 import { Cli } from './model/cli/cli';
 import MacBuilder from './model/mac-builder';
 import PlatformSetup from './model/platform-setup';
+
 async function runMain() {
   try {
     if (Cli.InitCliMode()) {
@@ -18,22 +19,34 @@ async function runMain() {
     const buildParameters = await BuildParameters.create();
     const baseImage = new ImageTag(buildParameters);
 
-    if (buildParameters.cloudRunnerCluster !== 'local') {
-      await CloudRunner.run(buildParameters, baseImage.toString());
-    } else {
+    let exitCode = -1;
+
+    if (buildParameters.providerStrategy === 'local') {
       core.info('Building locally');
       await PlatformSetup.setup(buildParameters, actionFolder);
-      if (process.platform === 'darwin') {
-        MacBuilder.run(actionFolder, workspace, buildParameters);
-      } else {
-        await Docker.run(baseImage, { workspace, actionFolder, ...buildParameters });
-      }
+      exitCode =
+        process.platform === 'darwin'
+          ? await MacBuilder.run(actionFolder)
+          : await Docker.run(baseImage.toString(), {
+              workspace,
+              actionFolder,
+              ...buildParameters,
+            });
+    } else {
+      await CloudRunner.run(buildParameters, baseImage.toString());
     }
 
     // Set output
     await Output.setBuildVersion(buildParameters.buildVersion);
+    await Output.setAndroidVersionCode(buildParameters.androidVersionCode);
+    await Output.setEngineExitCode(exitCode);
+
+    if (exitCode !== 0) {
+      core.setFailed(`Build failed with exit code ${exitCode}`);
+    }
   } catch (error) {
     core.setFailed((error as Error).message);
   }
 }
+
 runMain();

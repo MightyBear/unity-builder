@@ -9,15 +9,21 @@ echo "Returning floating license: \"$FLOATING_LICENSE\""
 
 if [[ -n "$UNITY_SERIAL" ]]; then
   #
-  # PROFESSIONAL (SERIAL) LICENSE MODE
+  # Return any floating license used.
+  #
+  echo "Returning floating license: \"$FLOATING_LICENSE\""
+  /opt/unity/Editor/Data/Resources/Licensing/Client/Unity.Licensing.Client --return-floating "$FLOATING_LICENSE"
+elif [[ -n "$UNITY_SERIAL" ]]; then
+  #
+  # SERIAL LICENSE MODE
   #
   # This will return the license that is currently in use.
   #
   unity-editor \
     -logFile /dev/stdout \
     -quit \
-    -returnlicense
+    -returnlicense \
+    -username "$UNITY_EMAIL" \
+    -password "$UNITY_PASSWORD" \
+    -projectPath "/BlankProject"
 fi
-
-# Return to previous working directory
-popd

@@ -1,41 +1,45 @@
-import CloudRunnerLogger from '../services/cloud-runner-logger';
-import CloudRunnerSecret from '../services/cloud-runner-secret';
-import { CloudRunnerFolders } from '../services/cloud-runner-folders';
-import YAML from 'yaml';
-import { CloudRunner, Input } from '../..';
+import CloudRunnerLogger from '../services/core/cloud-runner-logger';
+import CloudRunnerSecret from '../options/cloud-runner-secret';
+import { CloudRunnerFolders } from '../options/cloud-runner-folders';
+import CloudRunnerEnvironmentVariable from '../options/cloud-runner-environment-variable';
+import { ContainerHookService } from '../services/hooks/container-hook-service';
+import { ContainerHook } from '../services/hooks/container-hook';
+import CloudRunner from '../cloud-runner';
 
 export class CustomWorkflow {
-  public static async runCustomJob(buildSteps) {
-    try {
-      CloudRunnerLogger.log(`Cloud Runner is running in custom job mode`);
-      if (CloudRunner.buildParameters.cloudRunnerIntegrationTests) {
-        CloudRunnerLogger.log(`Parsing build steps: ${buildSteps}`);
-      }
-      try {
-        buildSteps = YAML.parse(buildSteps);
-      } catch (error) {
-        CloudRunnerLogger.log(`failed to parse a custom job "${buildSteps}"`);
-        throw error;
-      }
-      let output = '';
-      for (const step of buildSteps) {
-        const stepSecrets: CloudRunnerSecret[] = step.secrets.map((x) => {
-          const secret: CloudRunnerSecret = {
-            ParameterKey: x.name,
-            EnvironmentVariable: Input.ToEnvVarFormat(x.name),
-            ParameterValue: x.value,
-          };
+  public static async runContainerJobFromString(
+    buildSteps: string,
+    environmentVariables: CloudRunnerEnvironmentVariable[],
+    secrets: CloudRunnerSecret[],
+  ): Promise<string> {
+    return await CustomWorkflow.runContainerJob(
+      ContainerHookService.ParseContainerHooks(buildSteps),
+      environmentVariables,
+      secrets,
+    );
+  }
 
-          return secret;
-        });
-        output += await CloudRunner.Provider.runTask(
+  public static async runContainerJob(
+    steps: ContainerHook[],
+    environmentVariables: CloudRunnerEnvironmentVariable[],
+    secrets: CloudRunnerSecret[],
+  ) {
+    try {
+      let output = '';
+
+      // if (CloudRunner.buildParameters?.cloudRunnerDebug) {
+      //   CloudRunnerLogger.log(`Custom Job Description \n${JSON.stringify(buildSteps, undefined, 4)}`);
+      // }
+      for (const step of steps) {
+        CloudRunnerLogger.log(`Cloud Runner is running in custom job mode`);
+        output += await CloudRunner.Provider.runTaskInWorkflow(
           CloudRunner.buildParameters.buildGuid,
-          step['image'],
-          step['commands'],
+          step.image,
+          step.commands,
           `/${CloudRunnerFolders.buildVolumeFolder}`,
-          `/${CloudRunnerFolders.buildVolumeFolder}/`,
-          CloudRunner.cloudRunnerEnvironmentVariables,
-          [...CloudRunner.defaultSecrets, ...stepSecrets],
+          `/${CloudRunnerFolders.projectPathAbsolute}/`,
+          environmentVariables,
+          [...secrets, ...step.secrets],
         );
       }
 

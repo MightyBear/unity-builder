@@ -11,6 +11,10 @@ Parameters:
     Type: String
     Default: example
     Description: A name for the service
+  LogGroupName:
+    Type: String
+    Default: example
+    Description: Name to use for the log group created for this task
   ImageUrl:
     Type: String
     Default: nginx
@@ -26,7 +30,7 @@ Parameters:
     Type: Number
     Description: How much CPU to give the container. 1024 is 1 CPU
   ContainerMemory:
-    Default: 2048
+    Default: 4096
     Type: Number
     Description: How much memory in megabytes to give the container
   BUILDGUID:
@@ -68,36 +72,14 @@ Resources:
   LogGroup:
     Type: 'AWS::Logs::LogGroup'
     Properties:
-      LogGroupName: !Ref ServiceName
+      LogGroupName: !Ref LogGroupName
     Metadata:
       'AWS::CloudFormation::Designer':
         id: aece53ae-b82d-4267-bc16-ed964b05db27
-  SubscriptionFilter:
-    Type: 'AWS::Logs::SubscriptionFilter'
-    Properties:
-      FilterPattern: ''
-      RoleArn:
-        'Fn::ImportValue': !Sub '${'${EnvironmentName}'}:CloudWatchIAMRole'
-      LogGroupName: !Ref ServiceName
-      DestinationArn:
-        'Fn::GetAtt':
-          - KinesisStream
-          - Arn
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 7f809e91-9e5d-4678-98c1-c5085956c480
-    DependsOn:
-      - LogGroup
-      - KinesisStream
-  KinesisStream:
-    Type: 'AWS::Kinesis::Stream'
-    Properties:
-      Name: !Ref ServiceName
-      ShardCount: 1
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: c6f18447-b879-4696-8873-f981b2cedd2b
-  # template secrets p2 - secret
+  # template resources secrets
+
+  # template resources logstream
+
   TaskDefinition:
     Type: 'AWS::ECS::TaskDefinition'
     Properties:
@@ -147,10 +129,37 @@ Resources:
           LogConfiguration:
             LogDriver: awslogs
             Options:
-              awslogs-group: !Ref ServiceName
+              awslogs-group: !Ref LogGroupName
               awslogs-region: !Ref 'AWS::Region'
               awslogs-stream-prefix: !Ref ServiceName
     DependsOn:
       - LogGroup
+`;
+  public static streamLogs = `
+  SubscriptionFilter:
+    Type: 'AWS::Logs::SubscriptionFilter'
+    Properties:
+      FilterPattern: ''
+      RoleArn:
+        'Fn::ImportValue': !Sub '${'${EnvironmentName}'}:CloudWatchIAMRole'
+      LogGroupName: !Ref LogGroupName
+      DestinationArn:
+        'Fn::GetAtt':
+          - KinesisStream
+          - Arn
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 7f809e91-9e5d-4678-98c1-c5085956c480
+    DependsOn:
+      - LogGroup
+      - KinesisStream
+  KinesisStream:
+    Type: 'AWS::Kinesis::Stream'
+    Properties:
+      Name: !Ref ServiceName
+      ShardCount: 1
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: c6f18447-b879-4696-8873-f981b2cedd2b
 `;
 }

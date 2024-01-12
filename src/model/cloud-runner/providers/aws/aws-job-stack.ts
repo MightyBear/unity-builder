@@ -1,10 +1,13 @@
 import * as SDK from 'aws-sdk';
 import CloudRunnerAWSTaskDef from './cloud-runner-aws-task-def';
-import CloudRunnerSecret from '../../services/cloud-runner-secret';
+import CloudRunnerSecret from '../../options/cloud-runner-secret';
 import { AWSCloudFormationTemplates } from './aws-cloud-formation-templates';
-import CloudRunnerLogger from '../../services/cloud-runner-logger';
+import CloudRunnerLogger from '../../services/core/cloud-runner-logger';
 import { AWSError } from './aws-error';
 import CloudRunner from '../../cloud-runner';
+import { CleanupCronFormation } from './cloud-formations/cleanup-cron-formation';
+import CloudRunnerOptions from '../../options/cloud-runner-options';
+import { TaskDefinitionFormation } from './cloud-formations/task-definition-formation';
 
 export class AWSJobStack {
   private baseStackName: string;
@@ -24,20 +27,25 @@ export class AWSJobStack {
   ): Promise<CloudRunnerAWSTaskDef> {
     const taskDefStackName = `${this.baseStackName}-${buildGuid}`;
     let taskDefCloudFormation = AWSCloudFormationTemplates.readTaskCloudFormationTemplate();
-    const cpu = CloudRunner.buildParameters.cloudRunnerCpu || '1024';
-    const memory = CloudRunner.buildParameters.cloudRunnerMemory || '3072';
     taskDefCloudFormation = taskDefCloudFormation.replace(
       `ContainerCpu:
     Default: 1024`,
       `ContainerCpu:
-    Default: ${Number.parseInt(cpu)}`,
+    Default: ${Number.parseInt(CloudRunner.buildParameters.containerCpu)}`,
     );
     taskDefCloudFormation = taskDefCloudFormation.replace(
       `ContainerMemory:
     Default: 2048`,
       `ContainerMemory:
-    Default: ${Number.parseInt(memory)}`,
+    Default: ${Number.parseInt(CloudRunner.buildParameters.containerMemory)}`,
     );
+    if (!CloudRunnerOptions.asyncCloudRunner) {
+      taskDefCloudFormation = AWSCloudFormationTemplates.insertAtTemplate(
+        taskDefCloudFormation,
+        '# template resources logstream',
+        TaskDefinitionFormation.streamLogs,
+      );
+    }
     for (const secret of secrets) {
       secret.ParameterKey = `${buildGuid.replace(/[^\dA-Za-z]/g, '')}${secret.ParameterKey.replace(
         /[^\dA-Za-z]/g,
@@ -57,7 +65,7 @@ export class AWSJobStack {
       );
       taskDefCloudFormation = AWSCloudFormationTemplates.insertAtTemplate(
         taskDefCloudFormation,
-        'p2 - secret',
+        '# template resources secrets',
         AWSCloudFormationTemplates.getSecretTemplate(`${secret.ParameterKey}`),
       );
       taskDefCloudFormation = AWSCloudFormationTemplates.insertAtTemplate(
@@ -69,6 +77,7 @@ export class AWSJobStack {
     const secretsMappedToCloudFormationParameters = secrets.map((x) => {
       return { ParameterKey: x.ParameterKey.replace(/[^\dA-Za-z]/g, ''), ParameterValue: x.ParameterValue };
     });
+    const logGroupName = `${this.baseStackName}/${taskDefStackName}`;
     const parameters = [
       {
         ParameterKey: 'EnvironmentName',
@@ -81,6 +90,10 @@ export class AWSJobStack {
       {
         ParameterKey: 'ServiceName',
         ParameterValue: taskDefStackName,
+      },
+      {
+        ParameterKey: 'LogGroupName',
+        ParameterValue: logGroupName,
       },
       {
         ParameterKey: 'Command',
@@ -101,7 +114,7 @@ export class AWSJobStack {
       ...secretsMappedToCloudFormationParameters,
     ];
     CloudRunnerLogger.log(
-      `Starting AWS job with memory: ${CloudRunner.buildParameters.cloudRunnerMemory} cpu: ${CloudRunner.buildParameters.cloudRunnerCpu}`,
+      `Starting AWS job with memory: ${CloudRunner.buildParameters.containerMemory} cpu: ${CloudRunner.buildParameters.containerCpu}`,
     );
     let previousStackExists = true;
     while (previousStackExists) {
@@ -115,6 +128,7 @@ export class AWSJobStack {
         if (element.StackName === taskDefStackName && element.StackStatus !== 'DELETE_COMPLETE') {
           previousStackExists = true;
           CloudRunnerLogger.log(`Previous stack still exists: ${JSON.stringify(element)}`);
+          await new Promise((promise) => setTimeout(promise, 5000));
         }
       }
     }
@@ -124,14 +138,58 @@ export class AWSJobStack {
       Capabilities: ['CAPABILITY_IAM'],
       Parameters: parameters,
     };
-
     try {
+      CloudRunnerLogger.log(`Creating job aws formation ${taskDefStackName}`);
       await CF.createStack(createStackInput).promise();
-      CloudRunnerLogger.log('Creating cloud runner job');
       await CF.waitFor('stackCreateComplete', { StackName: taskDefStackName }).promise();
+      const describeStack = await CF.describeStacks({ StackName: taskDefStackName }).promise();
+      for (const parameter of parameters) {
+        if (!describeStack.Stacks?.[0].Parameters?.some((x) => x.ParameterKey === parameter.ParameterKey)) {
+          throw new Error(`Parameter ${parameter.ParameterKey} not found in stack`);
+        }
+      }
     } catch (error) {
       await AWSError.handleStackCreationFailure(error, CF, taskDefStackName);
       throw error;
+    }
+
+    const createCleanupStackInput: SDK.CloudFormation.CreateStackInput = {
+      StackName: `${taskDefStackName}-cleanup`,
+      TemplateBody: CleanupCronFormation.formation,
+      Capabilities: ['CAPABILITY_IAM'],
+      Parameters: [
+        {
+          ParameterKey: 'StackName',
+          ParameterValue: taskDefStackName,
+        },
+        {
+          ParameterKey: 'DeleteStackName',
+          ParameterValue: `${taskDefStackName}-cleanup`,
+        },
+        {
+          ParameterKey: 'TTL',
+          ParameterValue: `1080`,
+        },
+        {
+          ParameterKey: 'BUILDGUID',
+          ParameterValue: CloudRunner.buildParameters.buildGuid,
+        },
+        {
+          ParameterKey: 'EnvironmentName',
+          ParameterValue: this.baseStackName,
+        },
+      ],
+    };
+    if (CloudRunnerOptions.useCleanupCron) {
+      try {
+        CloudRunnerLogger.log(`Creating job cleanup formation`);
+        await CF.createStack(createCleanupStackInput).promise();
+
+        // await CF.waitFor('stackCreateComplete', { StackName: createCleanupStackInput.StackName }).promise();
+      } catch (error) {
+        await AWSError.handleStackCreationFailure(error, CF, taskDefStackName);
+        throw error;
+      }
     }
 
     const taskDefResources = (

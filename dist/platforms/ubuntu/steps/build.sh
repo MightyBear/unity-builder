@@ -63,27 +63,6 @@ else
 fi
 
 #
-# Prepare Android keystore and SDK, if needed
-#
-
-if [[ "$BUILD_TARGET" == "Android" && -n "$ANDROID_KEYSTORE_NAME" && -n "$ANDROID_KEYSTORE_BASE64" ]]; then
-  echo "Creating Android keystore."
-  echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$UNITY_PROJECT_PATH/$ANDROID_KEYSTORE_NAME"
-  echo "Created Android keystore."
-else
-  echo "Not creating Android keystore."
-fi
-
-if [[ "$BUILD_TARGET" == "Android" && -n "$ANDROID_SDK_MANAGER_PARAMETERS" ]]; then
-  echo "Updating Android SDK with parameters: $ANDROID_SDK_MANAGER_PARAMETERS"
-  export JAVA_HOME="$(awk -F'=' '/JAVA_HOME=/{print $2}' /usr/bin/unity-editor.d/*)"
-  "$(awk -F'=' '/ANDROID_HOME=/{print $2}' /usr/bin/unity-editor.d/*)/tools/bin/sdkmanager" "$ANDROID_SDK_MANAGER_PARAMETERS"
-  echo "Updated Android SDK."
-else
-  echo "Not updating Android SDK."
-fi
-
-#
 # Pre-build debug information
 #
 
@@ -127,7 +106,7 @@ echo ""
 
 unity-editor \
   -logfile /dev/stdout \
-  -quit \
+  $( [ "${MANUAL_EXIT}" == "true" ] || echo "-quit" ) \
   -customBuildName "$BUILD_NAME" \
   -projectPath "$UNITY_PROJECT_PATH" \
   -buildTarget "$BUILD_TARGET" \
@@ -161,6 +140,7 @@ fi
 
 # Make a given user owner of all artifacts
 if [[ -n "$CHOWN_FILES_TO" ]]; then
+  echo "Changing ownership of files to $CHOWN_FILES_TO for $BUILD_PATH_FULL and $UNITY_PROJECT_PATH"
   chown -R "$CHOWN_FILES_TO" "$BUILD_PATH_FULL"
   chown -R "$CHOWN_FILES_TO" "$UNITY_PROJECT_PATH"
 fi
