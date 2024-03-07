@@ -60,6 +60,10 @@ class Docker {
     return `docker run \
             --workdir ${dockerWorkspacePath} \
             --rm \
+            --cap-add=NET_ADMIN \
+            --cap-add=SYS_ADMIN \
+            --device=/dev/net/tun \
+            --user=0 \
             ${ImageEnvironmentFactory.getEnvVarString(parameters, additionalVariables)} \
             --env GITHUB_WORKSPACE=${dockerWorkspacePath} \
             --env GIT_CONFIG_EXTENSIONS \
