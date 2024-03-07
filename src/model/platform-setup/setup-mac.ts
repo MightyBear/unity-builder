@@ -188,6 +188,7 @@ class SetupMac {
     process.env.ANDROID_SYMBOL_TYPE = buildParameters.androidSymbolType;
     process.env.CUSTOM_PARAMETERS = buildParameters.customParameters;
     process.env.CHOWN_FILES_TO = buildParameters.chownFilesTo;
+    process.env.GIT_PRIVATE_KEY = buildParameters.gitPrivateKey;
     process.env.MANUAL_EXIT = buildParameters.manualExit.toString();
   }
 }

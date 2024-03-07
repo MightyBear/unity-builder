@@ -24,7 +24,12 @@ fi
 #
 # Run Build
 #
-
+source $ACTION_FOLDER/platforms/mac/steps/set_extra_git_configs.sh
+source $ACTION_FOLDER/platforms/mac/steps/set_gitcredential.sh
+source $ACTION_FOLDER/platforms/mac/steps/move_services-config.sh
+source $ACTION_FOLDER/platforms/mac/steps/get_floating_license.sh
+source $ACTION_FOLDER/platforms/mac/steps/build.sh
+source $ACTION_FOLDER/platforms/mac/steps/return_license.sh
 source $ACTION_FOLDER/platforms/mac/steps/build.sh
 
 #

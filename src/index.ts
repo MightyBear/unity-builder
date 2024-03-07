@@ -26,7 +26,7 @@ async function runMain() {
       await PlatformSetup.setup(buildParameters, actionFolder);
       exitCode =
         process.platform === 'darwin'
-          ? await MacBuilder.run(actionFolder)
+          ? await MacBuilder.run(actionFolder, buildParameters)
           : await Docker.run(baseImage.toString(), {
               workspace,
               actionFolder,
