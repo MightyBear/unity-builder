@@ -5,12 +5,19 @@
 #
 
 ### DEBUGS ###
+echo "####################DEBUGS####################"
 echo "ACTION_FOLDER: $ACTION_FOLDER"
 echo "GIT_PRIVATE_TOKEN: $GIT_PRIVATE_TOKEN"
+echo "##############################################"
+echo "DEBUG #1 env OUTPUT"
 env
+echo "##############################################"
+echo "DEBUG #2 sudo env OUTPUT"
 sudo env
+echo "##############################################"
 system_profiler SPSoftwareDataType
 whoami
+echo "##############################################"
 ################
 
 if [ "$SKIP_ACTIVATION" != "true" ]; then
@@ -18,8 +25,8 @@ if [ "$SKIP_ACTIVATION" != "true" ]; then
 
   if [ ! -d "$UNITY_LICENSE_PATH" ]; then
     echo "Creating Unity License Directory"
-    mkdir -p "$UNITY_LICENSE_PATH"
-    chmod -R 777 "$UNITY_LICENSE_PATH"
+    sudo /bin/mkdir -p "$UNITY_LICENSE_PATH"
+    sudo /bin/chmod -R 777 "$UNITY_LICENSE_PATH"
   fi;
 
   ACTIVATE_LICENSE_PATH="$ACTION_FOLDER/BlankProject"
