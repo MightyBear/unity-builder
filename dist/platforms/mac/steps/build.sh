@@ -105,6 +105,8 @@ echo ""
 
 echo "Creating \"$BUILD_PATH_FULL\" if it does not exist."
 sudo /bin/mkdir -p "$BUILD_PATH_FULL"
+sudo /bin/chown -R $(whoami) "$BUILD_PATH_FULL"
+sudo /bin/chmod -R 777 "$BUILD_PATH_FULL"
 ls -alh "$BUILD_PATH_FULL"
 
 echo ""
@@ -170,8 +172,8 @@ fi
 
 # Make a given user owner of all artifacts
 if [[ -n "$CHOWN_FILES_TO" ]]; then
-  sudo /bin/chown -R "$CHOWN_FILES_TO" "$BUILD_PATH_FULL"
-  sudo /bin/chown -R "$CHOWN_FILES_TO" "$UNITY_PROJECT_PATH"
+  sudo /bin/chown -R $(whoami) "$BUILD_PATH_FULL"
+  sudo /bin/chown -R $(whoami) "$UNITY_PROJECT_PATH"
 fi
 
 # Add read permissions for everyone to all artifacts
@@ -181,7 +183,7 @@ sudo /bin/chmod -R a+r "$UNITY_PROJECT_PATH"
 # Add execute permissions to specific files
 if [[ "$BUILD_TARGET" == "StandaloneOSX" ]]; then
   OSX_EXECUTABLE_PATH="$BUILD_PATH_FULL/$BUILD_NAME.app/Contents/MacOS"
-  find "$OSX_EXECUTABLE_PATH" -type f -exec  sudo /bin/chmod +x {} \;
+  sudo /bin/find "$OSX_EXECUTABLE_PATH" -type f -exec  sudo /bin/chmod +x {} \;
 fi
 
 #
