@@ -4,13 +4,22 @@
 # Perform Activation
 #
 
+### DEBUGS ###
+echo "ACTION_FOLDER: $ACTION_FOLDER"
+echo "GIT_PRIVATE_TOKEN: $GIT_PRIVATE_TOKEN"
+env
+sudo env
+system_profiler SPSoftwareDataType
+whoami
+################
+
 if [ "$SKIP_ACTIVATION" != "true" ]; then
   UNITY_LICENSE_PATH="/Library/Application Support/Unity"
 
   if [ ! -d "$UNITY_LICENSE_PATH" ]; then
     echo "Creating Unity License Directory"
-    sudo mkdir -p "$UNITY_LICENSE_PATH"
-    sudo chmod -R 777 "$UNITY_LICENSE_PATH"
+    mkdir -p "$UNITY_LICENSE_PATH"
+    chmod -R 777 "$UNITY_LICENSE_PATH"
   fi;
 
   ACTIVATE_LICENSE_PATH="$ACTION_FOLDER/BlankProject"
