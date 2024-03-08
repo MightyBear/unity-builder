@@ -170,8 +170,8 @@ fi
 
 # Make a given user owner of all artifacts
 if [[ -n "$CHOWN_FILES_TO" ]]; then
-  chown -R "$CHOWN_FILES_TO" "$BUILD_PATH_FULL"
-  chown -R "$CHOWN_FILES_TO" "$UNITY_PROJECT_PATH"
+  sudo /bin/chown -R "$CHOWN_FILES_TO" "$BUILD_PATH_FULL"
+  sudo /bin/chown -R "$CHOWN_FILES_TO" "$UNITY_PROJECT_PATH"
 fi
 
 # Add read permissions for everyone to all artifacts
