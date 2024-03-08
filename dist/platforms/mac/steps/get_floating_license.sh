@@ -28,7 +28,7 @@ sudo zerotier-cli info
 
 # Healthcheck on Licensing Server
 # curl --connect-timeout 10 'http://10.243.6.149:777/v1/status'
-zerotier-cli listnetworks
+sudo zerotier-cli listnetworks
 
 # Get Floating License
 for i in {1..15}

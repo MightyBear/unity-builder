@@ -4,11 +4,11 @@ ORIGINAL_FILE="$UNITY_PROJECT_PATH/services-config.json"
 TARGET_DIR="/Library/Application Support/Unity/config"
 
 # Create config folder
-mkdir -p "$TARGET_DIR"
+sudo /bin/mkdir -p "$TARGET_DIR"
 
 # Move file
 if [[ -e "$ORIGINAL_FILE" ]]; then
-    mv "$ORIGINAL_FILE" "$TARGET_DIR"
+    sudo /bin/mv "$ORIGINAL_FILE" "$TARGET_DIR"
     printf "services-config.json moved to $TARGET_DIR"
 else
     printf "services-config.json not found in $UNITY_PROJECT_PATH"

@@ -46,7 +46,7 @@ if [ -z "$BUILD_METHOD" ]; then
   #
   echo "Using built-in build method."
   # Create Editor directory if it does not exist
-  mkdir -p "$UNITY_PROJECT_PATH/Assets/Editor/"
+  sudo /bin/mkdir -p "$UNITY_PROJECT_PATH/Assets/Editor/"
   # Copy the build script of Unity Builder action
   cp -R "$ACTION_FOLDER/default-build-script/Assets/Editor/" "$UNITY_PROJECT_PATH/Assets/Editor/"
   # Set the Build method to that of UnityBuilder Action
@@ -104,7 +104,7 @@ echo "###########################"
 echo ""
 
 echo "Creating \"$BUILD_PATH_FULL\" if it does not exist."
-mkdir -p "$BUILD_PATH_FULL"
+sudo /bin/mkdir -p "$BUILD_PATH_FULL"
 ls -alh "$BUILD_PATH_FULL"
 
 echo ""
@@ -175,13 +175,13 @@ if [[ -n "$CHOWN_FILES_TO" ]]; then
 fi
 
 # Add read permissions for everyone to all artifacts
-chmod -R a+r "$BUILD_PATH_FULL"
-chmod -R a+r "$UNITY_PROJECT_PATH"
+sudo /bin/chmod -R a+r "$BUILD_PATH_FULL"
+sudo /bin/chmod -R a+r "$UNITY_PROJECT_PATH"
 
 # Add execute permissions to specific files
 if [[ "$BUILD_TARGET" == "StandaloneOSX" ]]; then
   OSX_EXECUTABLE_PATH="$BUILD_PATH_FULL/$BUILD_NAME.app/Contents/MacOS"
-  find "$OSX_EXECUTABLE_PATH" -type f -exec chmod +x {} \;
+  find "$OSX_EXECUTABLE_PATH" -type f -exec  sudo /bin/chmod +x {} \;
 fi
 
 #

@@ -30,7 +30,7 @@ if [ "$SKIP_ACTIVATION" != "true" ]; then
   fi;
 
   ACTIVATE_LICENSE_PATH="$ACTION_FOLDER/BlankProject"
-  mkdir -p "$ACTIVATE_LICENSE_PATH"
+  sudo /bin/mkdir -p "$ACTIVATE_LICENSE_PATH"
 
   source $ACTION_FOLDER/platforms/mac/steps/activate.sh
 else
