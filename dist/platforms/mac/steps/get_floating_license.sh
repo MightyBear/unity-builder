@@ -48,7 +48,7 @@ do
 	fi;
 done
 
-/Applications/Unity/Hub/Editor/2021.3.30f1/Unity.app/Contents/Frameworks/UnityLicensingClient.app/Contents/MacOS --acquire-floating > license.txt
+/Applications/Unity/Hub/Editor/2021.3.30f1/Unity.app/Contents/Frameworks/UnityLicensingClient.app/Contents/MacOS/Unity.Licensing.Client --acquire-floating > license.txt
 cat license.txt
 PARSEDFILE=$(grep -oP '\".*?\"' < license.txt | tr -d '"')
 export FLOATING_LICENSE
