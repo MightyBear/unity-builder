@@ -152,7 +152,7 @@ class BuildParameters {
       targetPlatform: Input.targetPlatform,
       projectPath: Input.projectPath,
       buildName: Input.buildName,
-      buildPath: `${Input.buildsPath}/${Input.targetPlatform}`,
+      buildPath: Input.buildsPath,
       buildFile,
       buildMethod: Input.buildMethod,
       buildVersion,
