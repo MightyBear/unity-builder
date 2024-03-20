@@ -5,17 +5,19 @@
 #
 source /steps/set_extra_git_configs.sh
 source /steps/set_gitcredential.sh
+source /steps/move_services-config.sh
+source /steps/get_floating_license.sh
 
-if [ "$SKIP_ACTIVATION" != "true" ]; then
-  source /steps/activate.sh
+# if [ "$SKIP_ACTIVATION" != "true" ]; then
+#   source /steps/activate.sh
 
-  # If we didn't activate successfully, exit with the exit code from the activation step.
-  if [[ $UNITY_EXIT_CODE -ne 0 ]]; then
-    exit $UNITY_EXIT_CODE
-  fi
-else
-  echo "Skipping activation"
-fi
+#   # If we didn't activate successfully, exit with the exit code from the activation step.
+#   if [[ $UNITY_EXIT_CODE -ne 0 ]]; then
+#     exit $UNITY_EXIT_CODE
+#   fi
+# else
+#   echo "Skipping activation"
+# fi
 
 source /steps/build.sh
 

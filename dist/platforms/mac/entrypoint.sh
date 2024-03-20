@@ -4,38 +4,22 @@
 # Perform Activation
 #
 
-### DEBUGS ###
-echo "####################DEBUGS####################"
-echo "ACTION_FOLDER: $ACTION_FOLDER"
-echo "GIT_PRIVATE_TOKEN: $GIT_PRIVATE_TOKEN"
-echo "##############################################"
-echo "DEBUG #1 env OUTPUT"
-env
-echo "##############################################"
-echo "DEBUG #2 sudo env OUTPUT"
-sudo env
-echo "##############################################"
-system_profiler SPSoftwareDataType
-whoami
-echo "##############################################"
-################
+# if [ "$SKIP_ACTIVATION" != "true" ]; then
+#   UNITY_LICENSE_PATH="/Library/Application Support/Unity"
 
-if [ "$SKIP_ACTIVATION" != "true" ]; then
-  UNITY_LICENSE_PATH="/Library/Application Support/Unity"
+#   if [ ! -d "$UNITY_LICENSE_PATH" ]; then
+#     echo "Creating Unity License Directory"
+#     sudo /bin/mkdir -p "$UNITY_LICENSE_PATH"
+#     sudo /bin/chmod -R 777 "$UNITY_LICENSE_PATH"
+#   fi;
 
-  if [ ! -d "$UNITY_LICENSE_PATH" ]; then
-    echo "Creating Unity License Directory"
-    sudo /bin/mkdir -p "$UNITY_LICENSE_PATH"
-    sudo /bin/chmod -R 777 "$UNITY_LICENSE_PATH"
-  fi;
+#   ACTIVATE_LICENSE_PATH="$ACTION_FOLDER/BlankProject"
+#   sudo /bin/mkdir -p "$ACTIVATE_LICENSE_PATH"
 
-  ACTIVATE_LICENSE_PATH="$ACTION_FOLDER/BlankProject"
-  sudo /bin/mkdir -p "$ACTIVATE_LICENSE_PATH"
-
-  source $ACTION_FOLDER/platforms/mac/steps/activate.sh
-else
-  echo "Skipping activation"
-fi
+#   source $ACTION_FOLDER/platforms/mac/steps/activate.sh
+# else
+#   echo "Skipping activation"
+# fi
 
 #
 # Run Build
