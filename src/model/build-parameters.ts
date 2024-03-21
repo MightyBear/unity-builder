@@ -152,7 +152,8 @@ class BuildParameters {
       targetPlatform: Input.targetPlatform,
       projectPath: Input.projectPath,
       buildName: Input.buildName,
-      buildPath: Input.buildsPath,
+      // buildPath: Input.buildsPath, for iOS
+      buildPath: `${Input.buildsPath}/${Input.targetPlatform}`,
       buildFile,
       buildMethod: Input.buildMethod,
       buildVersion,
