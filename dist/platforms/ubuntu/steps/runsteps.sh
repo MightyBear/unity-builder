@@ -20,10 +20,11 @@ source /steps/get_floating_license.sh
 # fi
 
 source /steps/build.sh
+source /steps/return_license.sh
 
-if [ "$SKIP_ACTIVATION" != "true" ]; then
-  source /steps/return_license.sh
-fi
+# if [ "$SKIP_ACTIVATION" != "true" ]; then
+#   source /steps/return_license.sh
+# fi
 
 #
 # Instructions for debugging
