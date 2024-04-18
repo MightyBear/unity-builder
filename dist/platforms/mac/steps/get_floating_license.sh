@@ -34,7 +34,7 @@ sudo zerotier-cli listnetworks
 for i in {1..15}
 
 do
-	OUTPUT=$(/Applications/Unity/Hub/Editor/2021.3.30f1/Unity.app/Contents/Frameworks/UnityLicensingClient.app/Contents/MacOS/Unity.Licensing.Client --acquire-floating)
+	OUTPUT=$(/Applications/Unity/Hub/Editor/$UNITY_VERSION/Unity.app/Contents/Frameworks/UnityLicensingClient.app/Contents/MacOS/Unity.Licensing.Client --acquire-floating)
 	echo "Try number $i of 15:"
 
 	if [ $(echo "$OUTPUT" | grep -Ecim1 '(Created|Renewed)') -eq 1 ]; then
@@ -48,7 +48,7 @@ do
 	fi;
 done
 
-/Applications/Unity/Hub/Editor/2021.3.30f1/Unity.app/Contents/Frameworks/UnityLicensingClient.app/Contents/MacOS/Unity.Licensing.Client --acquire-floating > license.txt
+/Applications/Unity/Hub/Editor/$UNITY_VERSION/Unity.app/Contents/Frameworks/UnityLicensingClient.app/Contents/MacOS/Unity.Licensing.Client --acquire-floating > license.txt
 cat license.txt
 PARSEDFILE=$(grep -oP '\".*?\"' < license.txt | tr -d '"')
 export FLOATING_LICENSE

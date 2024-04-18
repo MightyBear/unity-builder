@@ -46,16 +46,15 @@ source $ACTION_FOLDER/platforms/mac/steps/move_services-config.sh
 source $ACTION_FOLDER/platforms/mac/steps/get_floating_license.sh
 source $ACTION_FOLDER/platforms/mac/steps/build.sh
 source $ACTION_FOLDER/platforms/mac/steps/return_license.sh
-source $ACTION_FOLDER/platforms/mac/steps/build.sh
 
 #
 # License Cleanup
 #
 
-if [ "$SKIP_ACTIVATION" != "true" ]; then
-  source $ACTION_FOLDER/platforms/mac/steps/return_license.sh
-  rm -r "$ACTIVATE_LICENSE_PATH"
-fi
+# if [ "$SKIP_ACTIVATION" != "true" ]; then
+#   source $ACTION_FOLDER/platforms/mac/steps/return_license.sh
+#   rm -r "$ACTIVATE_LICENSE_PATH"
+# fi
 
 #
 # Instructions for debugging

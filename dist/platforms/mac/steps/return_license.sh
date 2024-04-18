@@ -6,7 +6,7 @@ pushd "$ACTIVATE_LICENSE_PATH"
 
 # MBG return method
 echo "Returning floating license: \"$FLOATING_LICENSE\"" 
-/Applications/Unity/Hub/Editor/2021.3.30f1/Unity.app/Contents/Frameworks/UnityLicensingClient.app/Contents/MacOS/Unity.Licensing.Client  --return-floating "$FLOATING_LICENSE"
+/Applications/Unity/Hub/Editor/$UNITY_VERSION/Unity.app/Contents/Frameworks/UnityLicensingClient.app/Contents/MacOS/Unity.Licensing.Client  --return-floating "$FLOATING_LICENSE"
 
 # GameCI return method
 # /Applications/Unity/Hub/Editor/$UNITY_VERSION/Unity.app/Contents/MacOS/Unity \
