@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-if [[ -n "$UNITY_LICENSING_SERVER" ]]; then
+
+echo "Running Returning license script. floating license: \"$FLOATING_LICENSE\""
+if [[ -n "$FLOATING_LICENSE" ]]; then
   #
   # Return any floating license used.
   #
